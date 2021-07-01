@@ -1,0 +1,39 @@
+.DEFAULT_GOAL := help
+
+MAKESTER__REPO_NAME := loum
+MAKESTER__PROJECT_NAME := sbt
+ALPINE_DOCKER_VERSION := 20210212
+OPENJDK_VERSION := 8
+OPENJDK_LONG_VERSION := $(OPENJDK_VERSION).292.10-r0
+SCALA_VERSION := 2.12
+SCALA_LONG_VERSION := $(SCALA_VERSION)
+SBT_VERSION := 1.3.13
+SBT_LONG_VERSION := $(SBT_VERSION)-r2
+MAKESTER__IMAGE_TARGET_TAG := scala${SCALA_VERSION}-${SBT_VERSION}
+MAKESTER__VERSION := $(MAKESTER__IMAGE_TARGET_TAG)
+
+include makester/makefiles/makester.mk
+include makester/makefiles/docker.mk
+
+MAKESTER__CONTAINER_NAME := sbt
+MAKESTER__BUILD_COMMAND = $(DOCKER) build\
+ --no-cache\
+ --build-arg ALPINE_DOCKER_VERSION=$(ALPINE_DOCKER_VERSION)\
+ --build-arg OPENJDK_LONG_VERSION=$(OPENJDK_LONG_VERSION)\
+ --build-arg SCALA_LONG_VERSION=$(SCALA_LONG_VERSION)\
+ --build-arg SBT_LONG_VERSION=$(SBT_LONG_VERSION)\
+ -t $(MAKESTER__SERVICE_NAME):$(MAKESTER__IMAGE_TARGET_TAG) .
+
+docker-login:
+	-@$(DOCKER) login $(MAKESTER__REPO_NAME)
+
+MAKESTER__RUN_COMMAND := $(DOCKER) run --rm -ti\
+ --name $(MAKESTER__CONTAINER_NAME)\
+ $(MAKESTER__SERVICE_NAME):$(MAKESTER__IMAGE_TARGET_TAG)\
+ sh
+
+help: makester-help docker-help
+	@echo "(Makefile)\n\
+  docker-login         Log into Docker container registry "$(MAKESTER__REPO_NAME)"\n"
+
+.PHONY: help

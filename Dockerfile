@@ -13,7 +13,7 @@ RUN set -eux; apk add --no-cache\
 ARG SBT_VERSION
 RUN wget -qO- https://github.com/sbt/sbt/releases/download/v${SBT_VERSION}/sbt-${SBT_VERSION}.tgz |\
  tar zxf - -C /opt &&\
- ln -s /opt/sbt/bin/sbt /usr/bin
+ ln -s /opt/sbt/bin/sbt /usr/local/bin
 
 # Add our user and group first to make sure their IDs get assigned consistently,
 # regardless of whatever dependencies get added.

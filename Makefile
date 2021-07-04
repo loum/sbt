@@ -25,22 +25,17 @@ MAKESTER__BUILD_COMMAND = $(DOCKER) build\
 MAKESTER__RUN_COMMAND := $(DOCKER) run --rm -ti\
  $(MAKESTER__SERVICE_NAME):$(HASH)
 
-sbt: HOST_COURSIER_CACHE := ~/.cache/coursier
-sbt: HOST_SBT_WORKING_DIR := ~/.sbt
-sbt: HOST_IVY2_WORKING_DIR := ~/.ivy2
+sbt: HOST_IVY2_WORKING_DIR := $(HOME)/.ivy2
 sbt:
-	@$(shell mkdir -pv\
- $(HOST_COURSIER_CACHE)\
- $(HOST_SBT_WORKING_DIR)\
- $(HOST_IVY2_WORKING_DIR))
+	@mkdir -pv $(HOST_IVY2_WORKING_DIR)
 	@$(DOCKER) run --rm -ti\
- -v ~/.cache/coursier:/home/sbt/.cache/coursier\
- -v ~/.ivy2:/home/sbt/.ivy2\
- -v $(PWD):/app\
- -v ~/.sbt:/home/sbt/.sbt\
+ -v $(HOST_IVY2_WORKING_DIR):/home/sbt/.ivy2\
+ -v sbtvol:/home/sbt/.sbt\
+ -v cachevol:/home/sbt/.cache\
+ --mount type=bind,source=$(PWD),target=/app\
  -e COURSIER_CACHE=/home/sbt/.cache/coursier\
  $(MAKESTER__SERVICE_NAME):$(HASH)\
- $(CMD)
+ $(CMD) || true
 
 sbt-help: CMD = help
 sbt-version: CMD = about
